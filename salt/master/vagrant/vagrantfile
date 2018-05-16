@@ -1,5 +1,5 @@
 VAGRANTFILE_API_VERSION = "2"
-epochBase36 = Time.now.to_i.to_s(36)
+
 saltRoot = "../../saltstack"
 masterRoot = "../../master"
 hostnameBase = `hostname`.strip

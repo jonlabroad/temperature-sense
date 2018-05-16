@@ -837,10 +837,10 @@
 # Pillar is laid out in the same fashion as the file server, with environments,
 # a top file and sls files. However, pillar data does not need to be in the
 # highstate format, and is generally just key/value pairs.
-#pillar_roots:
-#  base:
-#    - /srv/pillar
-#
+pillar_roots:
+  base:
+    - /srv/pillar
+
 #ext_pillar:
 #  - hiera: /etc/hiera.yaml
 #  - cmd_yaml: cat /etc/salt/yaml
@@ -1217,37 +1217,6 @@
 # https://github.com/ytoolshed/range/wiki/%22yamlfile%22-module-file-spec
 #
 #range_server: range:80
-
-
-#####  Windows Software Repo settings #####
-###########################################
-# Location of the repo on the master:
-#winrepo_dir_ng: '/srv/salt/win/repo-ng'
-#
-# List of git repositories to include with the local repo:
-#winrepo_remotes_ng:
-#  - 'https://github.com/saltstack/salt-winrepo-ng.git'
-
-
-#####  Windows Software Repo settings - Pre 2015.8 #####
-########################################################
-# Legacy repo settings for pre-2015.8 Windows minions.
-#
-# Location of the repo on the master:
-#winrepo_dir: '/srv/salt/win/repo'
-#
-# Location of the master's repo cache file:
-#winrepo_mastercachefile: '/srv/salt/win/repo/winrepo.p'
-#
-# List of git repositories to include with the local repo:
-#winrepo_remotes:
-#  - 'https://github.com/saltstack/salt-winrepo.git'
-
-# The refspecs fetched by winrepo remotes
-#winrepo_refspecs:
-#  - '+refs/heads/*:refs/remotes/origin/*'
-#  - '+refs/tags/*:refs/tags/*'
-#
 
 #####      Returner settings          ######
 ############################################
