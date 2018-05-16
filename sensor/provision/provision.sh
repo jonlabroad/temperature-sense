@@ -3,4 +3,4 @@
 #wget -O bootstrap-salt.sh https://bootstrap.saltstack.com
 #sudo sh bootstrap-salt.sh
 
-cp -rf ./etc/* /etc
+cp -rf ./sensor/provision/etc/* /etc
