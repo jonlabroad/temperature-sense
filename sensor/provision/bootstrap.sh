@@ -5,4 +5,5 @@ apt-get install -y git
 
 git clone https://github.com/jonlabroad/temperature-sense.git
 cd temperature-sense
-./sensor/provision.sh
+chmod +x ./sensor/provision/provision.sh
+./sensor/provision/provision.sh
