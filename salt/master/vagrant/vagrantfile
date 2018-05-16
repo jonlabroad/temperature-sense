@@ -1,0 +1,27 @@
+VAGRANTFILE_API_VERSION = "2"
+epochBase36 = Time.now.to_i.to_s(36)
+saltRoot = "../../saltstack"
+masterRoot = "../../master"
+hostnameBase = `hostname`.strip
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.define :master do |master_config|
+    master_config.vm.boot_timeout = 900
+    master_config.vm.box = "ubuntu/xenial64"
+    master_config.vm.host_name = 'saltmaster.local'
+    master_config.vm.synced_folder "#{saltRoot}/salt/", "/srv/salt"
+    master_config.vm.synced_folder "#{saltRoot}/pillar/", "/srv/pillar"
+    master_config.vm.provider :virtualbox do |vbox|
+      vbox.memory = 2048
+    end
+    master_config.vm.provision :salt do |salt|
+      salt.master_config = "../etc/master"
+      salt.install_type = "stable"
+      salt.install_master = true
+      salt.no_minion = true
+      salt.verbose = true
+      salt.colorize = true
+      salt.bootstrap_options = "-P -c /tmp"
+    end
+  end
+end
