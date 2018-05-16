@@ -13,6 +13,7 @@ function Main()
 
     Create-Policy
     Set-GroupPolicy
+    Create-AccessKey
 }
 
 function Create-User()
@@ -60,6 +61,19 @@ function Find-Policy($private:policyName)
             Write-Host "Found policy: $($policy.PolicyName)"
             return $policy
         }
+    }
+}
+
+function Create-AccessKey()
+{
+    $accessKeys = aws iam list-access-keys --user-name $script:username | ConvertFrom-Json
+    if ($accessKeys.AccessKeyMetadata.Count -eq 0)
+    {
+        $newAccessKey = aws iam create-access-key --user-name $script:username | ConvertFrom-Json
+        Write-Host ($newAccessKey | ConvertTo-Json)
+    }
+    else {
+        Write-Host "Access key already exists. Key id: $($accessKeys.AccessKeyMetadata.AccessKeyId)"
     }
 }
 
