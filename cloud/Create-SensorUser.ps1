@@ -42,7 +42,7 @@ function Set-GroupPolicy()
 
 function Create-Policy()
 {
-    aws iam create-policy --policy-name tempsensor-write --policy-document file://$__PATH__/config/tempuser-policy.json
+    aws iam create-policy --policy-name $script:policy --policy-document file://$__PATH__/config/tempuser-policy.json
 }
 
 function Create-Group()
