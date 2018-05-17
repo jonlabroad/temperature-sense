@@ -15,6 +15,7 @@ Recommended: Install firewall and allow Salt ports
 sudo apt-get install -y ufw
 ufw allow 4505
 ufw allow 4506
+```
 Install git and checkout this repo :)
 ``` sh
 sudo apt-get update
