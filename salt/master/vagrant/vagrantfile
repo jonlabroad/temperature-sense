@@ -11,7 +11,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     master_config.vm.host_name = 'saltmaster.local'
     master_config.vm.synced_folder "#{saltRoot}/salt/", "/srv/salt"
     master_config.vm.synced_folder "#{saltRoot}/pillar/", "/srv/pillar"
-    master_config.vm.synced_folder "#{saltRoot}
     master_config.vm.provider :virtualbox do |vbox|
       vbox.memory = 2048
     master_config.vm.network "forwarded_port", guest: 4505, host: 4505
