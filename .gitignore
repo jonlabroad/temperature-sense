@@ -1,1 +1,4 @@
 sensor/.aws/credentials
+master.pem
+master.pub
+salt/master/vagrant/.vagrant
