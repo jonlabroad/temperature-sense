@@ -1,0 +1,2 @@
+ufw enable:
+  cmd.run

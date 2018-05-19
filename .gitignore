@@ -2,3 +2,4 @@ sensor/.aws/credentials
 master.pem
 master.pub
 salt/master/vagrant/.vagrant
+/salt/saltstack/salt/files/.aws/credentials
