@@ -1,14 +1,7 @@
-/var/spool/cron/crontabs/root:
-  file.managed:
-    - source: salt://files/cron/root
-
-/etc/rsyslog.conf:
-  file.append:
-    - text:
-      - 'cron.*                          /var/log/cron.log'
-
-/etc/init.d/rsyslog restart:
-  cmd.run
+python /temperature/log_temp.py 2>&1 > /temperature/log_temp.log:
+  cron.present:
+    - user: root
+    - minute: '*/5'
 
 cron:
   service.running:
