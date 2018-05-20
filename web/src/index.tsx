@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import MatchTracker from "./components/MatchTracker";
+import TemperatureDashboard from "./components/TemperatureDashboard";
  
 ReactDOM.render(
-  <MatchTracker
+  <TemperatureDashboard
   />,
   document.getElementById("root")
 );

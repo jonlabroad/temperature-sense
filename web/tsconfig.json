@@ -9,6 +9,7 @@
         "lib": [
             "dom",
             "es5",
+            "es2015.promise",
             "scripthost",
             "es2015.iterable"
         ]
