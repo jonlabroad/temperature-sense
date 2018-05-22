@@ -2,8 +2,12 @@ import * as Moment from "moment-timezone"
 import Config from "./Config"
 
 export default class DateUtil {
+    public static getNow() : Moment.Moment {
+        return Moment().tz("America/New_York");
+    }
+    
     public static getTodayCalendarDate() {
-        var now : Moment.Moment = Moment().tz("America/New_York");
+        var now : Moment.Moment = DateUtil.getNow();
         return this.getCalendarDate(now);
     }
 

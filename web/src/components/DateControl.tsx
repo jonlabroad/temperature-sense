@@ -1,8 +1,12 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as ReactDOM from "react-dom"
+import DatePicker from 'react-datepicker'
+import DateUtil from '../DateUtil'
+import * as Moment from "moment-timezone"
 
 export interface DateControlProps {
-    selected : string;
+    selected : Moment.Moment;
+    onChangeHandler : any
 }
 
 export interface DateControlState {
@@ -17,10 +21,15 @@ export default class DateControl extends React.Component<DateControlProps, DateC
         }
     }
 
+    public componentDidMount() {
+    }
+
     render() {
         return (
-            <div>
-            </div>
+            <DatePicker
+                selected={this.props.selected}
+                onChange={this.props.onChangeHandler}
+            />
         );
     }
 }

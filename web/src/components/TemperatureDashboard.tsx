@@ -2,8 +2,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import BasicLinePlot from "./BasicLinePlot"
+import DateControl from "./DateControl"
 import DateUtil from "../DateUtil"
 import Credentials from "../aws/Credentials"
+import * as Moment from "moment-timezone"
 
 export interface TemperatureDashboardProps {
 }
@@ -14,7 +16,7 @@ export interface TemperatureDashboardState {
 
 class Selection
 {
-  public calendarDate: string;
+  public calendarDate: Moment.Moment;
 }
 
 export default class TemperatureDashboard extends React.Component<TemperatureDashboardProps, TemperatureDashboardState> {
@@ -23,7 +25,7 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
     constructor(props : any) {
         super(props);
         this.state = {
-          selection: { calendarDate: DateUtil.getTodayCalendarDate() }
+          selection: { calendarDate: DateUtil.getNow() }
         }
         this.setUrl();
 
@@ -58,17 +60,31 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
           </nav>
         );
       }
+
+      private handleDateChange(date: Moment.Moment) {
+        this.setState({
+          selection: {
+            calendarDate: date
+          }
+        });
+      }
        
     render() {
         return (
-            <div>
+          <div>
               {this.renderNavBar()}
+              <div>
+              <DateControl
+                selected={this.state.selection.calendarDate}
+                onChangeHandler={this.handleDateChange.bind(this)}
+              />
               <BasicLinePlot
                 height={400}
                 width={800}
-                calendarDate={DateUtil.getTodayCalendarDate()}
+                calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
               />
             </div>
+          </div>
         );
     }
 }

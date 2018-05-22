@@ -22,6 +22,8 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
     private thermoReader : ThermostatSettingDBReader;
     private chart : Highcharts.ChartObject;
 
+    private lastCalendarDateRead = "";
+
     constructor(props : any) {
         super(props);
         this.tempReader = new TemperatureDBReader();
@@ -160,6 +162,10 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
     }
 
     render() {
+        if (this.lastCalendarDateRead != this.props.calendarDate) {
+            this.readData(this.props.calendarDate);
+            this.lastCalendarDateRead = this.props.calendarDate;
+        }
         return (
             <div>
               <div id="container"></div>
