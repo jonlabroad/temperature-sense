@@ -20,11 +20,11 @@ export default class DateUtil {
     }
 
     public static getMonth(calendarDate : string) : number {
-        return parseInt(calendarDate.substr(2, 2));
+        return parseInt(calendarDate.substr(4, 2));
     }
 
     public static getDay(calendarDate : string) : number {
-        return parseInt(calendarDate.substr(4, 2));
+        return parseInt(calendarDate.substr(6, 2));
     }
 
     public static getHour(hourMin : string) : number {
@@ -48,15 +48,25 @@ export default class DateUtil {
 
     public static numberWith3LeadingZero(num : number) : string {
         var numString = "";
-        numString += num >= 100 && num < 1000 ? "0" : "";
-        numString += num >= 10 && num < 100 ? "0" : "";
-        numString += num < 10 ? "00" : "";
+        numString += num < 1000 ? "0" : "";
+        numString += num < 100 ? "0" : "";
+        numString += num < 10 ? "0" : "";
         numString += `${num}`;
         return numString;
     }    
 
     public static getMoment(calendarDate: string, hourMin: string) : Moment.Moment {
-        var moment : Moment.Moment = Moment(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`, "YYYYMMDD HHmm").tz(Config.timezone);
+        var moment : Moment.Moment = Moment(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`, "YYYYMMDD HHmm", );
+        //console.log(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`);
+        //console.log(`${moment.year()} ` + `${moment.month()} ` + `${moment.date()} ` + `${moment.hour()} ` + `${moment.minute()}`);
         return moment;
+    }
+
+    public static getDate(calendarDate: string, hourMin: string) : Date {
+        var date = new Date(DateUtil.getYear(calendarDate), DateUtil.getMonth(calendarDate) - 1, DateUtil.getDay(calendarDate),
+                            DateUtil.getHour(hourMin), DateUtil.getMin(hourMin), 0, 0);
+        date.setDate(DateUtil.getDay(calendarDate));
+        //console.log(`${DateUtil.getMonth(calendarDate)} ` + `${DateUtil.getDay(calendarDate)} ` +  `${DateUtil.getHour(hourMin)} ` +  `${DateUtil.getMin(hourMin)} `);
+        return date;
     }
 }

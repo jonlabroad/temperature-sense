@@ -10,6 +10,7 @@ import * as Moment from "moment-timezone"
 import ColorPicker from "../plotting/ColorPicker"
 import * as Highcharts from "highcharts"
 import ThermostatData from "../data/ThermostatData";
+import DateUtil from "../DateUtil"
 
 export interface BasicLinePlotProps {
     height : number;
@@ -57,6 +58,9 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
             title: {
                 text: "Home Temperature"
             },
+            xAxis: {
+                type: 'datetime'
+            },
             yAxis: {
                 title: {
                     text: 'Temp F'
@@ -75,12 +79,15 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
         for (var key in data.data) {
             var newSeries : any = {
                 name: `${key}`,
-                data: []
+                data: [],
             };
             var elements : TemperatureElement[] = data.data[key] as TemperatureElement[];
             for (var i in elements) {
-                newSeries.data.push([elements[i].date.unix(), elements[i].tempF]);
+                //var plotDate = DateUtil.getDate(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
+                var plotDate = DateUtil.getMoment(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
+                newSeries.data.push([plotDate.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000, elements[i].tempF]);
             }
+            console.log(`${newSeries.data[0]} ${Moment.tz("America/New_York").utcOffset()}`);
             chartDef.series.push(newSeries);
         }
         this.chart = Highcharts.chart('container', chartDef);
@@ -124,10 +131,10 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
 
         var newOptions : Highcharts.Options = {
             xAxis: {
-                plotBands: bands
+                plotBands: bands,
             }   
         }
-        this.chart.update(newOptions);
+        //this.chart.update(newOptions);
     }
 
     private getBandColor(hvacState : string) : string {
