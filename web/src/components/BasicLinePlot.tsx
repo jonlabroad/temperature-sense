@@ -108,13 +108,15 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
                     if (inBand) {
                         endX = data.data[i].date;
                         bands.push({
-                            from: beginX.unix(),
-                            to: endX.unix(),
+                            from: beginX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
+                            to: endX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
                             color: this.getBandColor(currentMode)
                         });
+                        inBand = false;
                     }
                     else {
                         beginX = data.data[i].date;
+                        console.log(`${i} begin: ${beginX}`);
                         inBand = data.data[i].hvacState != off;
                     }
                     currentMode = data.data[i].hvacState;
@@ -122,19 +124,21 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
             }
         }
         if (inBand) {
+            //console.log(`End Band: ${beginX} ${data.data[data.data.length - 1].date}`);
             bands.push({
-                from: beginX.unix(),
-                to: data.data[data.data.length - 1].date.unix(),
+                from: beginX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
+                to: data.data[data.data.length - 1].date.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
                 color: this.getBandColor(currentMode)              
             });
         }
 
+        console.log(bands);
         var newOptions : Highcharts.Options = {
             xAxis: {
                 plotBands: bands,
             }   
         }
-        //this.chart.update(newOptions);
+        this.chart.update(newOptions);
     }
 
     private getBandColor(hvacState : string) : string {
