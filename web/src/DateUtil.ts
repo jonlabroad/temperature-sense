@@ -57,8 +57,6 @@ export default class DateUtil {
 
     public static getMoment(calendarDate: string, hourMin: string) : Moment.Moment {
         var moment : Moment.Moment = Moment(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`, "YYYYMMDD HHmm", );
-        //console.log(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`);
-        //console.log(`${moment.year()} ` + `${moment.month()} ` + `${moment.date()} ` + `${moment.hour()} ` + `${moment.minute()}`);
         return moment;
     }
 
@@ -66,7 +64,6 @@ export default class DateUtil {
         var date = new Date(DateUtil.getYear(calendarDate), DateUtil.getMonth(calendarDate) - 1, DateUtil.getDay(calendarDate),
                             DateUtil.getHour(hourMin), DateUtil.getMin(hourMin), 0, 0);
         date.setDate(DateUtil.getDay(calendarDate));
-        //console.log(`${DateUtil.getMonth(calendarDate)} ` + `${DateUtil.getDay(calendarDate)} ` +  `${DateUtil.getHour(hourMin)} ` +  `${DateUtil.getMin(hourMin)} `);
         return date;
     }
 }

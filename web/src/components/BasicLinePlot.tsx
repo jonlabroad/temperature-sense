@@ -15,44 +15,27 @@ import DateUtil from "../DateUtil"
 export interface BasicLinePlotProps {
     height : number;
     width : number;
-    calendarDate : string
+    calendarDate : string;
+    temperatureData : TemperatureData;
+    thermostatData : ThermostatData;
 }
 
 export default class BasicLinePlot extends React.Component<BasicLinePlotProps, null> {
-    private tempReader : TemperatureDBReader;
-    private thermoReader : ThermostatSettingDBReader;
     private chart : Highcharts.ChartObject;
 
     private lastCalendarDateRead = "";
 
     constructor(props : any) {
         super(props);
-        this.tempReader = new TemperatureDBReader();
-        this.thermoReader = new ThermostatSettingDBReader();
     }
 
-    private readData(calendarDate : string) {
-        var self = this;
-        this.tempReader.query(calendarDate,
-            function(err: AWS.AWSError, data: TemperatureData) {
-                self.renderPlot(data, calendarDate);
-        });
+    componentDidUpdate() {
+        this.renderPlot();
     }
 
-    private readThermostatSettings(calendarDate : string) {
-        var self = this;
-        this.thermoReader.query(calendarDate,
-            function(err: AWS.AWSError, data: TemperatureData) {
-                self.renderThermoSetting(data);
-        });
-    }
-
-    componentDidMount() {
-        this.readData(this.props.calendarDate);
-    }
-
-    renderPlot(data : TemperatureData, calendarDate : string) {
+    renderPlot() {
         var colorPicker : ColorPicker = new ColorPicker();
+        var data = this.props.temperatureData;
 
         var chartDef : Highcharts.Options = {
             title: {
@@ -75,27 +58,31 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
             }
         }
 
-        chartDef.series = [];
-        for (var key in data.data) {
-            var newSeries : any = {
-                name: `${key}`,
-                data: [],
-            };
-            var elements : TemperatureElement[] = data.data[key] as TemperatureElement[];
-            for (var i in elements) {
-                //var plotDate = DateUtil.getDate(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
-                var plotDate = DateUtil.getMoment(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
-                newSeries.data.push([plotDate.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000, elements[i].tempF]);
+        if (data != null) {
+            chartDef.series = [];
+            for (var key in data.data) {
+                var newSeries : any = {
+                    name: `${key}`,
+                    data: [],
+                };
+                var elements : TemperatureElement[] = data.data[key] as TemperatureElement[];
+                for (var i in elements) {
+                    //var plotDate = DateUtil.getDate(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
+                    var plotDate = DateUtil.getMoment(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
+                    newSeries.data.push([plotDate.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000, elements[i].tempF]);
+                }
+                chartDef.series.push(newSeries);
             }
-            console.log(`${newSeries.data[0]} ${Moment.tz("America/New_York").utcOffset()}`);
-            chartDef.series.push(newSeries);
         }
         this.chart = Highcharts.chart('container', chartDef);
-
-        this.readThermostatSettings(calendarDate);
+        this.renderThermoSetting(this.props.thermostatData);
     }
 
     private renderThermoSetting(data : ThermostatData) {
+        if (data == null) {
+            return;
+        }
+        
         var off = "off";
         var inBand = false;
         var currentMode = off;
@@ -116,7 +103,6 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
                     }
                     else {
                         beginX = data.data[i].date;
-                        console.log(`${i} begin: ${beginX}`);
                         inBand = data.data[i].hvacState != off;
                     }
                     currentMode = data.data[i].hvacState;
@@ -124,7 +110,6 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
             }
         }
         if (inBand) {
-            //console.log(`End Band: ${beginX} ${data.data[data.data.length - 1].date}`);
             bands.push({
                 from: beginX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
                 to: data.data[data.data.length - 1].date.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
@@ -132,7 +117,6 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
             });
         }
 
-        console.log(bands);
         var newOptions : Highcharts.Options = {
             xAxis: {
                 plotBands: bands,
@@ -164,7 +148,6 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
                 maxDate = myMaxX;
             }            
         }
-        console.log([minDate, maxDate]);
         return [minDate, maxDate];
     }
 
@@ -173,10 +156,6 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
     }
 
     render() {
-        if (this.lastCalendarDateRead != this.props.calendarDate) {
-            this.readData(this.props.calendarDate);
-            this.lastCalendarDateRead = this.props.calendarDate;
-        }
         return (
             <div>
               <div id="container"></div>

@@ -6,12 +6,17 @@ import DateControl from "./DateControl"
 import DateUtil from "../DateUtil"
 import Credentials from "../aws/Credentials"
 import * as Moment from "moment-timezone"
+import TemperatureData from "../data/TemperatureData";
+import ThermostatData from "../data/ThermostatData";
+import TemperatureDataProvider from "../TemperatureDataProvider";
 
 export interface TemperatureDashboardProps {
 }
 
 export interface TemperatureDashboardState {
   selection : Selection;
+  temperatureData : TemperatureData;
+  thermostatData : ThermostatData;
 }
 
 class Selection
@@ -20,16 +25,24 @@ class Selection
 }
 
 export default class TemperatureDashboard extends React.Component<TemperatureDashboardProps, TemperatureDashboardState> {
-    private componentMounted : boolean = false;
-    
+  private debugId = -1;
+  private static nextId = 0;
+  
+  private componentMounted : boolean = false;
+    private dataProvider : TemperatureDataProvider;
+
     constructor(props : any) {
         super(props);
+        this.debugId = TemperatureDashboard.nextId++;
         this.state = {
-          selection: { calendarDate: DateUtil.getNow() }
+          selection: { calendarDate: DateUtil.getNow() },
+          temperatureData: null,
+          thermostatData: null
         }
         this.setUrl();
 
         new Credentials().init();
+        this.dataProvider = new TemperatureDataProvider();
     }
 
       protected setUrl() {
@@ -40,10 +53,35 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         if (!this.componentMounted) {
             this.componentMounted = true;
         }
+        this.dataProvider.readTemperature(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setTempState.bind(this));
+        this.dataProvider.readThermostatSetting(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setThermoState.bind(this));
       }
 
       public componentWillUnmount() {
           this.componentMounted = false;
+      }
+
+      private setDataState(tempData? : TemperatureData, thermoData? : ThermostatData) {
+        if (this.componentMounted) {
+          var newState : TemperatureDashboardState = {
+              selection: this.state.selection,
+              temperatureData: tempData != null ? tempData : this.state.temperatureData,
+              thermostatData: thermoData != null ? thermoData : this.state.thermostatData,
+          };
+          this.setState(newState);
+        }
+      }
+
+      private setTempState(tempData : TemperatureData) {
+        if (tempData != null) {
+          this.setDataState(tempData, null);
+        }
+      }
+
+      private setThermoState(thermoData : ThermostatData) {
+        if (thermoData != null) {
+          this.setDataState(null, thermoData);
+        }
       }
 
       protected renderSelectors() {
@@ -82,6 +120,8 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
                 height={400}
                 width={800}
                 calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                temperatureData={this.state.temperatureData}
+                thermostatData={this.state.thermostatData}
               />
             </div>
           </div>

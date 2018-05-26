@@ -33,9 +33,6 @@ export default class TemperatureDBReader
 
     private processData(err: AWS.AWSError, data: AWS.DynamoDB.Types.QueryOutput, handleFunc?: (err: AWS.AWSError, data: TemperatureData) => void) {
         var processedData : TemperatureData = new TemperatureData();
-        console.log(Object.keys(data));
-        console.log(data.Count);
-        console.log(data.ScannedCount);
         for (var i in data.Items) {
             var processedElement = new TemperatureElement(data.Items[i]);
             if (!(processedElement.sensorName in processedData.data)) {
