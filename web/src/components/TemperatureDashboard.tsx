@@ -53,8 +53,7 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         if (!this.componentMounted) {
             this.componentMounted = true;
         }
-        this.dataProvider.readTemperature(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setTempState.bind(this));
-        this.dataProvider.readThermostatSetting(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setThermoState.bind(this));
+        this.readData(DateUtil.getCalendarDate(this.state.selection.calendarDate));
       }
 
       public componentWillUnmount() {
@@ -84,6 +83,11 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         }
       }
 
+      protected readData(calendarDate : string) {
+        this.dataProvider.readTemperature(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setTempState.bind(this));
+        this.dataProvider.readThermostatSetting(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setThermoState.bind(this));
+      }
+
       protected renderSelectors() {
           return "";
       }
@@ -105,6 +109,7 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
             calendarDate: date
           }
         });
+        this.readData(DateUtil.getCalendarDate(date));
       }
        
     render() {
