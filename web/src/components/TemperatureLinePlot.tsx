@@ -14,6 +14,8 @@ import DateUtil from "../DateUtil"
 import BaseLinePlotConfigurator from "../plotting/BaseLinePlotConfigurator";
 import XYPlotDataGenerator from "../plotting/XYPlotDataGenerator";
 import Config from "../Config";
+import ThermostatModeBandGenerator from "../plotting/ThermostatModeBandGenerator";
+import SeriesLabeler from "../plotting/SeriesLabeler";
 
 export interface BasicLinePlotProps {
     height : number;
@@ -25,7 +27,7 @@ export interface BasicLinePlotProps {
 
 export default class TemperatureLinePlot extends React.Component<BasicLinePlotProps, null> {
     private chart : Highcharts.ChartObject;
-    private static tzOffset : number = Moment.tz(Config.timezone).utcOffset()*60*1000;
+    public static tzOffset : number = Moment.tz(Config.timezone).utcOffset()*60*1000;
     private lastCalendarDateRead = "";
 
     constructor(props : any) {
@@ -46,11 +48,11 @@ export default class TemperatureLinePlot extends React.Component<BasicLinePlotPr
         var colorPicker : ColorPicker = new ColorPicker();
         var data = this.props.temperatureData;
 
-        var chartDef = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp F");
+        var chartDef = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp (F)");
         if (data != null) {
             chartDef.series = [];
             for (var key in data.data) {
-                var newSeries = new XYPlotDataGenerator().generate(key, data.data[key], this.createDataPoint.bind(this));
+                var newSeries = new XYPlotDataGenerator().generate(SeriesLabeler.getLabel(key), data.data[key], this.createDataPoint.bind(this));
                 chartDef.series.push(newSeries);
             }
         }
@@ -62,77 +64,12 @@ export default class TemperatureLinePlot extends React.Component<BasicLinePlotPr
         if (data == null) {
             return;
         }
-        
-        var off = "off";
-        var inBand = false;
-        var currentMode = off;
-        var beginX;
-        var endX;
-        var bands : Highcharts.PlotBands[] = [];
-        for (var i in data.data) {
-            if (data.data[i].hvacState != undefined) {
-                if (data.data[i].hvacState != currentMode) {
-                    if (inBand) {
-                        endX = data.data[i].date;
-                        bands.push({
-                            from: beginX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
-                            to: endX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
-                            color: this.getBandColor(currentMode)
-                        });
-                        inBand = false;
-                    }
-                    else {
-                        beginX = data.data[i].date;
-                        inBand = data.data[i].hvacState != off;
-                    }
-                    currentMode = data.data[i].hvacState;
-                }
-            }
-        }
-        if (inBand) {
-            bands.push({
-                from: beginX.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
-                to: data.data[data.data.length - 1].date.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000,
-                color: this.getBandColor(currentMode)              
-            });
-        }
-
         var newOptions : Highcharts.Options = {
             xAxis: {
-                plotBands: bands,
+                plotBands: new ThermostatModeBandGenerator().generate(data),
             }   
         }
         this.chart.update(newOptions);
-    }
-
-    private getBandColor(hvacState : string) : string {
-        if (hvacState == 'cooling') {
-            return '#EBF5FF';
-        }
-        if (hvacState == 'heating') {
-            return '#FFEBEB';
-        }
-    }
-
-    private calculateXLimits(data : TemperatureData) : Moment.Moment[] {
-        var minDate : Moment.Moment = null;
-        var maxDate : Moment.Moment = null;
-        for (var key in data.data) {
-            var thisData : TemperatureElement[] = data.data[key] as TemperatureElement[];
-            var myMinX = thisData[0].date;
-            var myMaxX = thisData[thisData.length-1].date;
-            if (minDate == null || myMinX < minDate) {
-                minDate = myMinX;
-            }
-            if (maxDate == null || myMaxX > maxDate) {
-                maxDate = myMaxX;
-            }            
-        }
-        return [minDate, maxDate];
-    }
-
-    private getBands(data : ThermostatData) {
-
     }
 
     render() {
