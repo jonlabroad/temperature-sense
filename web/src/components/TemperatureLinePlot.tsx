@@ -44,10 +44,8 @@ export default class TemperatureLinePlot extends React.Component<BasicLinePlotPr
         return pt;
     }
 
-    renderPlot() {
-        var colorPicker : ColorPicker = new ColorPicker();
-        var data = this.props.temperatureData;
-
+    renderTemperatureSeries(data : TemperatureData)
+    {
         var chartDef = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp (F)");
         if (data != null) {
             chartDef.series = [];
@@ -57,7 +55,6 @@ export default class TemperatureLinePlot extends React.Component<BasicLinePlotPr
             }
         }
         this.chart = Highcharts.chart('container', chartDef);
-        this.renderThermoSetting(this.props.thermostatData);
     }
 
     private renderThermoSetting(data : ThermostatData) {
@@ -70,6 +67,11 @@ export default class TemperatureLinePlot extends React.Component<BasicLinePlotPr
             }   
         }
         this.chart.update(newOptions);
+    }
+
+    renderPlot() {
+        this.renderTemperatureSeries(this.props.temperatureData);
+        this.renderThermoSetting(this.props.thermostatData);
     }
 
     render() {
