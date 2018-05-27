@@ -11,6 +11,9 @@ import ColorPicker from "../plotting/ColorPicker"
 import * as Highcharts from "highcharts"
 import ThermostatData from "../data/ThermostatData";
 import DateUtil from "../DateUtil"
+import BaseLinePlotConfigurator from "../plotting/BaseLinePlotConfigurator";
+import XYPlotDataGenerator from "../plotting/XYPlotDataGenerator";
+import Config from "../Config";
 
 export interface BasicLinePlotProps {
     height : number;
@@ -20,9 +23,9 @@ export interface BasicLinePlotProps {
     thermostatData : ThermostatData;
 }
 
-export default class BasicLinePlot extends React.Component<BasicLinePlotProps, null> {
+export default class TemperatureLinePlot extends React.Component<BasicLinePlotProps, null> {
     private chart : Highcharts.ChartObject;
-
+    private static tzOffset : number = Moment.tz(Config.timezone).utcOffset()*60*1000;
     private lastCalendarDateRead = "";
 
     constructor(props : any) {
@@ -33,44 +36,21 @@ export default class BasicLinePlot extends React.Component<BasicLinePlotProps, n
         this.renderPlot();
     }
 
+    private createDataPoint(element :TemperatureElement) : [number, number] {
+        var plotDate = DateUtil.getMoment(element.calendarDate.toString(), element.hourMin.toString());
+        var pt : [number, number] = [plotDate.unix()*1000 + TemperatureLinePlot.tzOffset, element.tempF];
+        return pt;
+    }
+
     renderPlot() {
         var colorPicker : ColorPicker = new ColorPicker();
         var data = this.props.temperatureData;
 
-        var chartDef : Highcharts.Options = {
-            title: {
-                text: "Home Temperature"
-            },
-            xAxis: {
-                type: 'datetime'
-            },
-            yAxis: {
-                title: {
-                    text: 'Temp F'
-                }
-            },
-            plotOptions: {
-                line: {
-                    marker: {
-                        enabled: false
-                    }
-                }
-            }
-        }
-
+        var chartDef = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp F");
         if (data != null) {
             chartDef.series = [];
             for (var key in data.data) {
-                var newSeries : any = {
-                    name: `${key}`,
-                    data: [],
-                };
-                var elements : TemperatureElement[] = data.data[key] as TemperatureElement[];
-                for (var i in elements) {
-                    //var plotDate = DateUtil.getDate(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
-                    var plotDate = DateUtil.getMoment(elements[i].calendarDate.toString(), elements[i].hourMin.toString());
-                    newSeries.data.push([plotDate.unix()*1000 + Moment.tz("America/New_York").utcOffset()*60*1000, elements[i].tempF]);
-                }
+                var newSeries = new XYPlotDataGenerator().generate(key, data.data[key], this.createDataPoint.bind(this));
                 chartDef.series.push(newSeries);
             }
         }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import BasicLinePlot from "./BasicLinePlot"
+import TemperatureLinePlot from "./TemperatureLinePlot"
 import DateControl from "./DateControl"
 import DateUtil from "../DateUtil"
 import Credentials from "../aws/Credentials"
@@ -121,7 +121,7 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
                 selected={this.state.selection.calendarDate}
                 onChangeHandler={this.handleDateChange.bind(this)}
               />
-              <BasicLinePlot
+              <TemperatureLinePlot
                 height={400}
                 width={800}
                 calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
