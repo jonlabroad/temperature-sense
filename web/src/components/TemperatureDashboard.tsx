@@ -60,15 +60,19 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
           this.componentMounted = false;
       }
 
-      private setDataState(tempData? : TemperatureData, thermoData? : ThermostatData) {
+      private setStateNoNulls(selection? : Selection, tempData? : TemperatureData, thermoData? : ThermostatData) {
         if (this.componentMounted) {
           var newState : TemperatureDashboardState = {
-              selection: this.state.selection,
+              selection: selection != null ? selection : this.state.selection,
               temperatureData: tempData != null ? tempData : this.state.temperatureData,
               thermostatData: thermoData != null ? thermoData : this.state.thermostatData,
           };
           this.setState(newState);
         }
+      }
+
+      private setDataState(tempData? : TemperatureData, thermoData? : ThermostatData) {
+          this.setStateNoNulls(null, tempData, thermoData);
       }
 
       private setTempState(tempData : TemperatureData) {
@@ -84,8 +88,8 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
       }
 
       protected readData(calendarDate : string) {
-        this.dataProvider.readTemperature(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setTempState.bind(this));
-        this.dataProvider.readThermostatSetting(DateUtil.getCalendarDate(this.state.selection.calendarDate), this.setThermoState.bind(this));
+        this.dataProvider.readTemperature(calendarDate, this.setTempState.bind(this));
+        this.dataProvider.readThermostatSetting(calendarDate, this.setThermoState.bind(this));
       }
 
       protected renderSelectors() {
@@ -104,11 +108,10 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
       }
 
       private handleDateChange(date: Moment.Moment) {
-        this.setState({
-          selection: {
+        this.setStateNoNulls({
             calendarDate: date
           }
-        });
+        );
         this.readData(DateUtil.getCalendarDate(date));
       }
        
