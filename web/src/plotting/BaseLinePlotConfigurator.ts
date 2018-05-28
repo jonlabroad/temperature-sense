@@ -14,7 +14,7 @@ export default class BaseLinePlotConfigurator
             yAxis: {
                 title: {
                     text: yLabel
-                }
+                },
             },            
             plotOptions: {
                 line: {

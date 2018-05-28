@@ -16,9 +16,8 @@ import XYPlotDataGenerator from "../plotting/XYPlotDataGenerator";
 import Config from "../Config";
 import ThermostatModeBandGenerator from "../plotting/ThermostatModeBandGenerator";
 import SeriesLabeler from "../plotting/SeriesLabeler";
-import ThermostatSettingOverlayConfigurator from "../plotting/ThermostatSettingOverlayConfigurator";
 
-export interface TemperatureLinePlotProps {
+export interface HumidityLinePlotProps {
     id : string;
     height : number;
     width : number;
@@ -27,7 +26,7 @@ export interface TemperatureLinePlotProps {
     thermostatData : ThermostatData;
 }
 
-export default class TemperatureLinePlot extends React.Component<TemperatureLinePlotProps, null> {
+export default class HumidityLinePlot extends React.Component<HumidityLinePlotProps, null> {
     private chart : Highcharts.ChartObject;
     public static tzOffset : number = Moment.tz(Config.timezone).utcOffset()*60*1000;
     private lastCalendarDateRead = "";
@@ -41,14 +40,18 @@ export default class TemperatureLinePlot extends React.Component<TemperatureLine
     }
 
     private createDataPoint(element :TemperatureElement) : [number, number] {
-        var plotDate = DateUtil.getMoment(element.calendarDate.toString(), element.hourMin.toString());
-        var pt : [number, number] = [plotDate.unix()*1000 + TemperatureLinePlot.tzOffset, element.tempF];
-        return pt;
+        if (element.humidity != undefined || element.humidity != null)
+        {
+            var plotDate = DateUtil.getMoment(element.calendarDate.toString(), element.hourMin.toString());
+            var pt : [number, number] = [plotDate.unix()*1000 + HumidityLinePlot.tzOffset, element.humidity];
+            return pt;
+        }
+        return null;
     }
 
     renderTemperatureSeries(data : TemperatureData)
     {
-        var chartDef : Highcharts.Options = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp (F)");
+        var chartDef = new BaseLinePlotConfigurator().configure("Home Humidity", "Time", "Relative Humiditity (%)");
         if (data != null) {
             chartDef.series = [];
             for (var key in data.data) {
@@ -66,12 +69,7 @@ export default class TemperatureLinePlot extends React.Component<TemperatureLine
         var newOptions : Highcharts.Options = {
             xAxis: {
                 plotBands: new ThermostatModeBandGenerator().generate(data),
-            }
-        }
-
-        var settingLines = new ThermostatSettingOverlayConfigurator().generate(data);
-        for (var i in settingLines) {
-            this.chart.addSeries(settingLines[i]);
+            }   
         }
         this.chart.update(newOptions);
     }

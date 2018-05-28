@@ -8,8 +8,12 @@ export default class XYPlotDataGenerator
             name: seriesName,
             data: []
         };
+
         for (var i in dataElements) {
-            newSeries.data.push(perElementFunc(dataElements[i]));
+            var datapoint = perElementFunc(dataElements[i]);
+            if (datapoint != null) {
+                newSeries.data.push(datapoint);
+            }
         }
         return newSeries;
     }

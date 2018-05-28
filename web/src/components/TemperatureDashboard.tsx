@@ -9,6 +9,10 @@ import * as Moment from "moment-timezone"
 import TemperatureData from "../data/TemperatureData";
 import ThermostatData from "../data/ThermostatData";
 import TemperatureDataProvider from "../TemperatureDataProvider";
+import HumidityLinePlot from "./HumdityLinePlot";
+import WeatherPlot from "./WeatherPlot";
+import WeatherData from "../data/WeatherData";
+import WeatherDataProvider from "../WeatherDataProvider";
 
 export interface TemperatureDashboardProps {
 }
@@ -17,6 +21,7 @@ export interface TemperatureDashboardState {
   selection : Selection;
   temperatureData : TemperatureData;
   thermostatData : ThermostatData;
+  weatherData : WeatherData;
 }
 
 class Selection
@@ -30,6 +35,7 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
   
   private componentMounted : boolean = false;
     private dataProvider : TemperatureDataProvider;
+    private weatherDataProvider : WeatherDataProvider;
 
     constructor(props : any) {
         super(props);
@@ -37,12 +43,14 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         this.state = {
           selection: { calendarDate: DateUtil.getNow() },
           temperatureData: null,
-          thermostatData: null
+          thermostatData: null,
+          weatherData: null
         }
         this.setUrl();
 
         new Credentials().init();
         this.dataProvider = new TemperatureDataProvider();
+        this.weatherDataProvider = new WeatherDataProvider();
     }
 
       protected setUrl() {
@@ -60,19 +68,20 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
           this.componentMounted = false;
       }
 
-      private setStateNoNulls(selection? : Selection, tempData? : TemperatureData, thermoData? : ThermostatData) {
+      private setStateNoNulls(selection? : Selection, tempData? : TemperatureData, thermoData? : ThermostatData, weatherData? : WeatherData) {
         if (this.componentMounted) {
           var newState : TemperatureDashboardState = {
               selection: selection != null ? selection : this.state.selection,
               temperatureData: tempData != null ? tempData : this.state.temperatureData,
               thermostatData: thermoData != null ? thermoData : this.state.thermostatData,
+              weatherData: weatherData != null ? weatherData : this.state.weatherData
           };
           this.setState(newState);
         }
       }
 
-      private setDataState(tempData? : TemperatureData, thermoData? : ThermostatData) {
-          this.setStateNoNulls(null, tempData, thermoData);
+      private setDataState(tempData? : TemperatureData, thermoData? : ThermostatData, weatherData? : WeatherData) {
+          this.setStateNoNulls(null, tempData, thermoData, weatherData);
       }
 
       private setTempState(tempData : TemperatureData) {
@@ -87,9 +96,16 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         }
       }
 
+      private setWeatherData(weatherData : WeatherData) {
+        if (weatherData != null) {
+          this.setDataState(null, null, weatherData);
+        }
+      }
+
       protected readData(calendarDate : string) {
         this.dataProvider.readTemperature(calendarDate, this.setTempState.bind(this));
         this.dataProvider.readThermostatSetting(calendarDate, this.setThermoState.bind(this));
+        this.weatherDataProvider.readWeatherData(calendarDate, this.setWeatherData.bind(this));
       }
 
       protected renderSelectors() {
@@ -120,18 +136,40 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
           <div>
               {this.renderNavBar()}
               <div>
-              <DateControl
-                selected={this.state.selection.calendarDate}
-                onChangeHandler={this.handleDateChange.bind(this)}
-              />
-              <TemperatureLinePlot
-                height={400}
-                width={800}
-                calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
-                temperatureData={this.state.temperatureData}
-                thermostatData={this.state.thermostatData}
-              />
-            </div>
+                <DateControl
+                  selected={this.state.selection.calendarDate}
+                  onChangeHandler={this.handleDateChange.bind(this)}
+                />
+              </div>
+              <div>
+                <TemperatureLinePlot
+                  id="HomeTemperaturePlot"
+                  height={400}
+                  width={800}
+                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                  temperatureData={this.state.temperatureData}
+                  thermostatData={this.state.thermostatData}
+                />
+             </div>
+             <div>
+                <HumidityLinePlot
+                  id="HomeHumidityPlot"
+                  height={400}
+                  width={800}
+                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                  temperatureData={this.state.temperatureData}
+                  thermostatData={this.state.thermostatData}
+                />
+             </div>
+             <div>
+                <WeatherPlot
+                  id="WeatherTempPlot"
+                  height={400}
+                  width={800}
+                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                  weatherData={this.state.weatherData}
+                />
+             </div>
           </div>
         );
     }
