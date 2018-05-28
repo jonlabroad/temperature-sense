@@ -135,42 +135,46 @@ export default class TemperatureDashboard extends React.Component<TemperatureDas
         return (
           <div>
               {this.renderNavBar()}
-              <div>
-                <DateControl
-                  selected={this.state.selection.calendarDate}
-                  onChangeHandler={this.handleDateChange.bind(this)}
-                />
-              </div>
-              <div>
-                <TemperatureLinePlot
-                  id="HomeTemperaturePlot"
-                  height={400}
-                  width={800}
-                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
-                  temperatureData={this.state.temperatureData}
-                  thermostatData={this.state.thermostatData}
-                />
-             </div>
-             <div>
-                <HumidityLinePlot
-                  id="HomeHumidityPlot"
-                  height={400}
-                  width={800}
-                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
-                  temperatureData={this.state.temperatureData}
-                  thermostatData={this.state.thermostatData}
-                />
-             </div>
-             <div>
-                <WeatherPlot
-                  id="WeatherTempPlot"
-                  height={400}
-                  width={800}
-                  calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
-                  weatherData={this.state.weatherData}
-                />
-             </div>
+                <div className="container">
+                  <div className="row">
+                    <div className="col-10">
+                      <DateControl
+                        selected={this.state.selection.calendarDate}
+                        onChangeHandler={this.handleDateChange.bind(this)}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-10">
+                      <TemperatureLinePlot
+                        id="HomeTemperaturePlot"
+                        calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                        temperatureData={this.state.temperatureData}
+                        thermostatData={this.state.thermostatData}
+                      />
+                    </div>
+                  </div>
+                  <div className="row weather-plot">
+                    <div className="col-10">
+                      <WeatherPlot
+                        id="WeatherTempPlot"
+                        calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                        weatherData={this.state.weatherData}
+                      />
+                    </div>
+                  </div>
+                 <div className="row">
+                  <div className="col-10">
+                    <HumidityLinePlot
+                      id="HomeHumidityPlot"
+                      calendarDate={DateUtil.getCalendarDate(this.state.selection.calendarDate)}
+                      temperatureData={this.state.temperatureData}
+                      thermostatData={this.state.thermostatData}
+                    />
+                  </div>
+                </div>
           </div>
+        </div>
         );
     }
 }

@@ -14,11 +14,11 @@ import ThermostatModeBandGenerator from "../plotting/ThermostatModeBandGenerator
 import SeriesLabeler from "../plotting/SeriesLabeler";
 import WeatherElement from "../data/WeatherElement";
 import WeatherData from "../data/WeatherData";
+import WeatherSymbolProvider from "../WeatherSymbolProvider";
+import TemperatureLinePlot from "./TemperatureLinePlot";
 
 export interface WeatherPlotProps {
     id : string;
-    height : number;
-    width : number;
     calendarDate : string;
     weatherData : WeatherData;
 }
@@ -39,11 +39,29 @@ export default class WeatherPlot extends React.Component<WeatherPlotProps, null>
     private createDataPoint(element : WeatherElement) : [number, number] {
         if (element != null)
         {
-            var plotDate = DateUtil.getMoment(element.calendarDate.toString(), element.hourMin.toString());
-            var pt : [number, number] = [plotDate.unix()*1000 + WeatherPlot.tzOffset, element.tempF];
+            var pt : [number, number] = [element.date.unix()*1000 + WeatherPlot.tzOffset, element.tempF];
             return pt;
         }
         return null;
+    }
+
+    private renderIcons(chart : Highcharts.ChartObject) {
+        if (chart.series[0])
+        {
+            var lastPtHourMin : number = -100;
+            for (var i in chart.series[0].data) {
+                var weatherElement = this.props.weatherData.data[i];
+                if (weatherElement.hourMin - lastPtHourMin > 100)
+                {
+                    var icon = weatherElement.icon;
+                    var iconUrl = WeatherSymbolProvider.getSymbolUrl(icon);
+                    chart.renderer
+                        .image(iconUrl, chart.xAxis[0].toPixels(chart.series[0].data[i].x), 30, 50, 50)
+                        .add();
+                    lastPtHourMin = weatherElement.hourMin;
+                }
+            }
+        }
     }
 
     renderTemperatureSeries(data : WeatherData)
@@ -54,7 +72,10 @@ export default class WeatherPlot extends React.Component<WeatherPlotProps, null>
             var newSeries = new XYPlotDataGenerator().generate("Temperature", data.data, this.createDataPoint.bind(this));
             chartDef.series.push(newSeries);
         }
-        this.chart = Highcharts.chart(this.props.id, chartDef);
+        chartDef.legend = {
+            enabled: false
+        };
+        this.chart = Highcharts.chart(this.props.id, chartDef, this.renderIcons.bind(this));
     }
 
     renderPlot() {
@@ -63,9 +84,7 @@ export default class WeatherPlot extends React.Component<WeatherPlotProps, null>
 
     render() {
         return (
-            <div>
-              <div id={this.props.id}></div>
-            </div>
+           <div id={this.props.id} className="weather-plot"></div>
         );
     }
 }

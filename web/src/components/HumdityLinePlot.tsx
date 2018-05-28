@@ -19,8 +19,6 @@ import SeriesLabeler from "../plotting/SeriesLabeler";
 
 export interface HumidityLinePlotProps {
     id : string;
-    height : number;
-    width : number;
     calendarDate : string;
     temperatureData : TemperatureData;
     thermostatData : ThermostatData;

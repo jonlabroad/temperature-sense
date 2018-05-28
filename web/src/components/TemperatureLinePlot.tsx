@@ -20,8 +20,6 @@ import ThermostatSettingOverlayConfigurator from "../plotting/ThermostatSettingO
 
 export interface TemperatureLinePlotProps {
     id : string;
-    height : number;
-    width : number;
     calendarDate : string;
     temperatureData : TemperatureData;
     thermostatData : ThermostatData;
@@ -56,6 +54,14 @@ export default class TemperatureLinePlot extends React.Component<TemperatureLine
                 chartDef.series.push(newSeries);
             }
         }
+        chartDef.legend = {
+            layout: "vertical",
+            align: "left",
+            verticalAlign: "top",
+            floating: true,
+            x: 100,
+            y: 40
+        };
         this.chart = Highcharts.chart(this.props.id, chartDef);
     }
 
