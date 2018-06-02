@@ -1,0 +1,26 @@
+
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "sourceMap": true,
+        "outDir": "dist/",
+        "noImplicitAny": false,
+        "allowJs": true,
+        "target": "es6",
+        "lib": [
+            "dom",
+            "es6",
+            "es2015",
+            "es2015.promise",
+            "scripthost",
+            "es2015.iterable"
+        ],
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}

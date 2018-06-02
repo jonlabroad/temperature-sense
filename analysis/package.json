@@ -1,0 +1,26 @@
+{
+  "name": "analysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/daily.js",
+  "bin": {
+    "daily": "./bin/daily"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jonathan LaBroad",
+  "license": "ISC",
+  "dependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/moment": "^2.13.0",
+    "@types/moment-timezone": "^0.5.4",
+    "@types/node": "^10.1.2",
+    "aws-sdk": "^2.250.1",
+    "es6-promise": "^4.2.4",
+    "moment-timezone": "^0.5.17"
+  },
+  "devDependencies": {
+    "@types/es6-promise": "^3.3.0"
+  }
+}
