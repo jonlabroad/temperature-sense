@@ -13,6 +13,7 @@ export default class ThermostatElement {
     public targetTempHighF: number;
     public targetTempLowF: number;
     public date : Moment.Moment;
+    public tempF : number;
 
     constructor(dataItem: AWS.DynamoDB.AttributeMap) {
         this.calendarDate = parseInt(dataItem["CalendarDate"].N);
@@ -26,6 +27,7 @@ export default class ThermostatElement {
         this.leaf = this.getFieldNotUndefined(dataItem, 'Leaf', 'BOOL') == 'true';
         this.targetTempHighF = parseInt(this.getFieldNotUndefined(dataItem, "TargetTempHighF", "N"));
         this.targetTempLowF = parseInt(this.getFieldNotUndefined(dataItem, 'TargetTempLowF', "N"));
+        this.tempF = parseInt(this.getFieldNotUndefined(dataItem, 'CurrentTempF', "N"));
     }
 
     private getFieldNotUndefined(element : any, fieldName : string, subfield : string) : string {

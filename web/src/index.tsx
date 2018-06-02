@@ -1,10 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import Main from "./components/Main";
 
-import TemperatureDashboard from "./components/TemperatureDashboard";
- 
 ReactDOM.render(
-  <TemperatureDashboard
+  <Main
   />,
   document.getElementById("root")
 );

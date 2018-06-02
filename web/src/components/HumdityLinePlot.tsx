@@ -66,7 +66,7 @@ export default class HumidityLinePlot extends React.Component<HumidityLinePlotPr
         }
         var newOptions : Highcharts.Options = {
             xAxis: {
-                plotBands: new ThermostatModeBandGenerator().generate(data),
+                plotBands: new ThermostatModeBandGenerator().generate(data, false, false),
             }   
         }
         this.chart.update(newOptions);

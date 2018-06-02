@@ -17,12 +17,18 @@ import Config from "../Config";
 import ThermostatModeBandGenerator from "../plotting/ThermostatModeBandGenerator";
 import SeriesLabeler from "../plotting/SeriesLabeler";
 import ThermostatSettingOverlayConfigurator from "../plotting/ThermostatSettingOverlayConfigurator";
+import HvacRateCalculator from "../analysis/HvacRateCalculator";
+import TemperatureLineSettings from "./TemperatureLineSettings";
 
 export interface TemperatureLinePlotProps {
     id : string;
+    title : string;
     calendarDate : string;
     temperatureData : TemperatureData;
     thermostatData : ThermostatData;
+    settings : TemperatureLineSettings;
+    excludeList : any;
+    includeList : any;
 }
 
 export default class TemperatureLinePlot extends React.Component<TemperatureLinePlotProps, null> {
@@ -44,14 +50,27 @@ export default class TemperatureLinePlot extends React.Component<TemperatureLine
         return pt;
     }
 
+    private isExcluded(key : string)
+    {
+        if (this.props.includeList != null) {
+            return this.props.includeList[key] !== true;
+        }
+        if (this.props.excludeList != null) {
+            return this.props.excludeList[key] === true;
+        }
+        return false;
+    }
+
     renderTemperatureSeries(data : TemperatureData)
     {
-        var chartDef : Highcharts.Options = new BaseLinePlotConfigurator().configure("Home Temperature", "Time", "Temp (F)");
+        var chartDef : Highcharts.Options = new BaseLinePlotConfigurator().configure(this.props.title, "Time", "Temp (F)");
         if (data != null) {
             chartDef.series = [];
             for (var key in data.data) {
-                var newSeries = new XYPlotDataGenerator().generate(SeriesLabeler.getLabel(key), data.data[key], this.createDataPoint.bind(this));
-                chartDef.series.push(newSeries);
+                if (!this.isExcluded(key)) {
+                    var newSeries = new XYPlotDataGenerator().generate(SeriesLabeler.getLabel(key), data.data[key], this.createDataPoint.bind(this));
+                    chartDef.series.push(newSeries);
+                }
             }
         }
         chartDef.legend = {
@@ -69,15 +88,20 @@ export default class TemperatureLinePlot extends React.Component<TemperatureLine
         if (data == null) {
             return;
         }
-        var newOptions : Highcharts.Options = {
-            xAxis: {
-                plotBands: new ThermostatModeBandGenerator().generate(data),
-            }
+        var newOptions : Highcharts.Options = {};
+        if (this.props.settings.showHvacBands) {
+            newOptions = {
+                xAxis: {
+                    plotBands: new ThermostatModeBandGenerator().generate(data, true, this.props.settings.showHvacRates),
+                }
+            };
         }
 
-        var settingLines = new ThermostatSettingOverlayConfigurator().generate(data);
-        for (var i in settingLines) {
-            this.chart.addSeries(settingLines[i]);
+        if (this.props.settings.showHvacSetting) {
+            var settingLines = new ThermostatSettingOverlayConfigurator().generate(data);
+            for (var i in settingLines) {
+                this.chart.addSeries(settingLines[i]);
+            }
         }
         this.chart.update(newOptions);
     }

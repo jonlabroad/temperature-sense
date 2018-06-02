@@ -13,6 +13,10 @@ export default class SeriesLabeler
                 return "LivingRoom";
             case "temp-piz-office-1":
                 return "Office";
+            case "temp-piz-water1":
+                return "Water Heater";
+            case "temp-piz-kitchen1":
+                return "Kitchen";
             default:
                 return datasetName;
         }
