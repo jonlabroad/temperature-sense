@@ -1,10 +1,5 @@
 import Config from "../Config";
-
-enum OutdoorCondition {
-    NIGHT,
-    DAY_SUNNY,
-    DAY_CLOUDY
-}
+import HvacState from "./HvacState";
 
 class BinCenterFinder {
     public static binSizeF = Config.BinSizeF;
@@ -15,10 +10,27 @@ class BinCenterFinder {
 
 export default class RateBinKey {
     public binCenterF : number;
-    public outdoorCondition : OutdoorCondition;
+    public hvacState : string;
+    public outdoorCondition : string;
 
-    constructor(tempF : number, condition : OutdoorCondition) {
+    constructor(tempF : number, condition : string, hvacState : string) {
         this.binCenterF = new BinCenterFinder().getBinCenter(tempF);
         this.outdoorCondition = condition;
+        this.hvacState = hvacState;
+    }
+
+    public static getHvacState(hvacState : string) : string {
+        switch(hvacState) {
+            case "cooling":
+                return HvacState.COOLING;
+            case "heating":
+                return HvacState.HEATING;
+            default:
+                return HvacState.IDLE;
+        }
+    }
+
+    public getKey() {
+        return `${this.binCenterF.toFixed(1)} ${this.outdoorCondition.toString()} ${this.hvacState.toString()}`;
     }
 }

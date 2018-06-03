@@ -5,3 +5,5 @@ salt/master/vagrant/.vagrant
 /salt/saltstack/salt/files/.aws/credentials
 web/node_modules
 /web/dist
+/analysis/dist
+/analysis/node_modules

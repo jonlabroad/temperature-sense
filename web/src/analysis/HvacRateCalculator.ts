@@ -41,9 +41,6 @@ export default class HvacRateCalculator {
             }
             iDataEnd = i;
         }
-        console.log([iDataBegin, iDataEnd]);
-        console.log(elements[iDataEnd].tempF, elements[iDataBegin].tempF);
-        console.log(elements[iDataEnd].date.unix(), elements[iDataBegin].date.unix());
         var rate = (elements[iDataEnd].tempF - elements[iDataBegin].tempF)/(elements[iDataEnd].date.unix() - elements[iDataBegin].date.unix())*3600;
         console.log(rate);
         return rate;

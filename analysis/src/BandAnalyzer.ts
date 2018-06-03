@@ -20,9 +20,17 @@ export default class BandAnalyzer {
         var roomData: TemperatureElement[] = this.tempData.data[id] as TemperatureElement[];
         var bandRates = new Array<TempBandRate>();
         for (var i in this.bands) {
-            var bandExtent = this.getBandExtent(this.bands[i], roomData);
+            if (this.bands[i].start == this.bands[i].stop) {
+                continue;
+            }
 
-            // TODO filter any bands that look funky (windows open, spikey data (AC on and heat going up, etc) invalid)
+            var bandExtent = this.getBandExtent(this.bands[i], roomData);
+            if (bandExtent[0] < 0 || bandExtent[1] < 0) {
+                continue;
+            }
+
+            // TODO filter any bands that look funky (windows open, spikey data [AC on and heat going up, etc] invalid)
+            
             var rate = this.calculateRate(bandExtent, roomData);
             bandRates.push(new TempBandRate(this.bands[i], rate));
         }
@@ -47,9 +55,6 @@ export default class BandAnalyzer {
                 }
                 iEnd = parseInt(i);
             }            
-        }
-        if (iEnd < 0) {
-            console.log([band, iStart, iEnd]);
         }
         return [iStart, iEnd];
     }

@@ -1,3 +1,4 @@
+declare const Promise: any;
 import AWS = require('aws-sdk')
 import Config from "../Config"
 

@@ -40,6 +40,20 @@ export default class DateUtil {
         return parseInt(hourMin.substr(hourMin.length - 2, 2));
     }
 
+    public static getCalendarDateRange(begin : string, end : string) : string[] {
+        var currDate = DateUtil.getMomentNoTime(begin);
+        var calendarDates : string[] = new Array<string>();
+        while (true) {
+            var currCalendarDate = DateUtil.getCalendarDate(currDate);
+            calendarDates.push(currCalendarDate);
+            if (currCalendarDate === end) {
+                break;
+            }
+            currDate.add(1, 'day');
+        }
+        return calendarDates;
+    }
+
     public static numberWith1LeadingZero(num : number) : string {
         var numString = num < 10 ? "0" : "";
         numString += `${num}`;
@@ -59,6 +73,11 @@ export default class DateUtil {
         var moment : Moment.Moment = Moment(`${calendarDate} ${DateUtil.numberWith3LeadingZero(parseInt(hourMin))}`, "YYYYMMDD HHmm", );
         return moment;
     }
+
+    public static getMomentNoTime(calendarDate: string) : Moment.Moment {
+        var moment : Moment.Moment = Moment(`${calendarDate}`, "YYYYMMDD", );
+        return moment;
+    }    
 
     public static getDate(calendarDate: string, hourMin: string) : Date {
         var date = new Date(DateUtil.getYear(calendarDate), DateUtil.getMonth(calendarDate) - 1, DateUtil.getDay(calendarDate),
